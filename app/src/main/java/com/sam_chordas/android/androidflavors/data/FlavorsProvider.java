@@ -89,7 +89,8 @@ public class FlavorsProvider extends ContentProvider{
 			if(_id > 0){
 				returnUri = FlavorEntry.buildFlavorsUri(_id);
 			} else{
-				throw new android.database.SQLException("Failed to insert row into: " + uri);			}
+				throw new android.database.SQLException("Failed to insert row into: " + uri);			
+			}
 			break;
 		}
 
@@ -126,4 +127,44 @@ public class FlavorsProvider extends ContentProvider{
 				throw new UnsupportedOperationException("Unknown uri: " + uri);
 		}
 	}
+
+	@Override
+	public int bulkInsert(Uri uri, ContentValues[] values){
+		final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+		final int match = sUriMatcher.match(uri);
+
+		switch(match){
+			case FLAVOR:
+				db.beginTransaction();
+
+				int numInserted = 0;
+				try{
+					for(ContentValues value : values){
+						if (value == null){
+							throw new IllegalArgumentException("Cannot have null content values");
+						}
+						long _id = -1;
+						try{
+							-id = db.insertOrThrow(FlavorEntry.TABLE_FLAVORS, null, value);
+						}catch(SQLiteConstraintException e) {
+							Log.w(LOG_TAG, "Attempting to insert " + value.getAsString(FlavorEntry.COLUMN_VERSION_NAME)
+									+ " but value is already in database.");
+						}
+						if (_id != 1){
+							numInserted++;
+						}
+					}
+				} finally {
+					db.endTransaction();
+				}
+				if (numInserted > 0){
+					getContext().getContentResolver().notifyChange(uri, null);
+				}
+				return numInserted;
+			default:
+				return super.bulkInsert(uri, values);
+		}
+	}
+
+
 }
