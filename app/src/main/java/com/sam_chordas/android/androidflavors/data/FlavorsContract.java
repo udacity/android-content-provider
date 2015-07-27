@@ -19,7 +19,6 @@ public class FlavorsContract{
 		public static final String _ID = "_id";
 		public static final String COLUMN_ICON = "icon";
 		public static final String COLUMN_VERSION_NAME = "version_name";
-		public static final String COLUMN_VERSION_NUMBER = "version_number";
 
 		public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
 			.appendPath(FLAVOR).build();

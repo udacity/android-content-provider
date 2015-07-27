@@ -24,8 +24,7 @@ public class FlavorsDBHelper extends SQLiteOpenHelper {
 				" INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				FlavorsContract.FlavorEntry.COLUMN_VERSION_NAME
 				+ " TEXT NOT NULL, " + FlavorsContract.FlavorEntry.COLUMN_ICON +
-				" BLOB NOT NULL, " +
-				FlavorsContract.FlavorEntry.COLUMN_VERSION_NUMBER + " TEXT NOT NULL);";
+				" BLOB NOT NULL);";
 
 		sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
 	}

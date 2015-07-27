@@ -1,12 +1,18 @@
 package com.sam_chordas.android.androidflavors;
 
-import android.support.v4.app.Fragment;
+import android.content.ContentValues;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import com.sam_chordas.android.androidflavors.data.FlavorsContract;
+
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 
@@ -43,5 +49,27 @@ public class MainActivityFragment extends Fragment {
         gridView.setAdapter(mFlavorAdapter);
 
         return rootView;
+    }
+
+    public void insertData(){
+        ContentValues[] flavorValuesArr = new ContentValues[flavors.length];
+        for(int i = 0; i < flavors.length; i++){
+
+            // Convert image to byte array to store in SQL blob
+            Bitmap map = BitmapFactory.decodeResource(getResources(), flavors[i].image);
+            int bytes = map.getRowBytes() * map.getHeight();
+            ByteBuffer byteBuffer = ByteBuffer.allocate(bytes);
+            map.copyPixelsToBuffer(byteBuffer);
+            byte[] bytesArr = byteBuffer.array();
+
+            flavorValuesArr[i].put(FlavorsContract.FlavorEntry.COLUMN_ICON,
+                    flavors[i].image);
+
+            flavorValuesArr[i].put(FlavorsContract.FlavorEntry.COLUMN_VERSION_NAME,
+                    flavors[i].name);
+        }
+
+        getActivity().getContentResolver().bulkInsert(FlavorsContract.FlavorEntry.CONTENT_URI,
+                flavorValuesArr);
     }
 }
