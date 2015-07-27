@@ -1,35 +1,37 @@
-package com.sam_chordas.android.androidflavors;
+package com.sam_chordas.android.androidflavors.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
+
 
 public class FlavorsProvider extends ContentProvider{
 	private static final String LOG_TAG = FlavorsProvider.class.getSimpleName();
 	private static final UriMatcher sUriMatcher = buildUriMatcher();
-	private FlavorsDBhelper mOpenHelper;
+	private FlavorsDBHelper mOpenHelper;
 
 	private static final int FLAVOR = 100;
 	private static final int FLAVOR_WITH_ID = 200;
 
 	private static UriMatcher buildUriMatcher(){
 		final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
-		final String authority = FlavorContract.CONTENT_AUTHORITY;
+		final String authority = FlavorsContract.CONTENT_AUTHORITY;
 
-		matcher.addURI(authority, FlavorEntry.TABLE_FLAVORS, FLAVOR);
-		matcher.addURI(authority, FlavorEntry.TABLE_FLAVORS + "/#", FLAVOR_WITH_ID);
+		matcher.addURI(authority, FlavorsContract.FlavorEntry.TABLE_FLAVORS, FLAVOR);
+		matcher.addURI(authority, FlavorsContract.FlavorEntry.TABLE_FLAVORS + "/#", FLAVOR_WITH_ID);
 
 		return matcher;	
 	}
 
 	@Override
 	public boolean onCreate(){
-		mOpenHelper = new FlavorDBHelper(getContext());
+		mOpenHelper = new FlavorsDBHelper(getContext());
 
 		return true;
 	}
@@ -40,10 +42,10 @@ public class FlavorsProvider extends ContentProvider{
 
 		switch (match){
 			case FLAVOR:{
-				return FlavorEntry.CONTENT_DIR_TYPE;
+				return FlavorsContract.FlavorEntry.CONTENT_DIR_TYPE;
 			}
 			case FLAVOR_WITH_ID:{ 
-				return FlavorEntry.CONTENT_ITEM_TYPE;
+				return FlavorsContract.FlavorEntry.CONTENT_ITEM_TYPE;
 			}
 			default:{
 				throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -54,9 +56,10 @@ public class FlavorsProvider extends ContentProvider{
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder){
 		Cursor retCursor;
-		switch(sUriMatcher.match(uri){
+		switch(sUriMatcher.match(uri)){
 			case FLAVOR:{    
-				retCursor = mOpenHelper.getReadableDatabase().query(FlavorEntry.TABLE_FLAVORS,
+				retCursor = mOpenHelper.getReadableDatabase().query(
+						FlavorsContract.FlavorEntry.TABLE_FLAVORS,
 						projection,
 						selection,
 						selectionArgs,
@@ -66,16 +69,17 @@ public class FlavorsProvider extends ContentProvider{
 				return retCursor;
 			}
 			case FLAVOR_WITH_ID:{
-				retCursor = mOpenHelper.getReadableDatabase().query(FlavorEntry.TABLE_FLAVORS,
+				retCursor = mOpenHelper.getReadableDatabase().query(
+						FlavorsContract.FlavorEntry.TABLE_FLAVORS,
 						projection,
-						FlavorEntry._ID + " = ?",
+						FlavorsContract.FlavorEntry._ID + " = ?",
 						new String[] {String.valueOf(ContentUris.parseId(uri))},
 						null,
 						null,
 						sortOrder);
 				return retCursor;
 			}
-			default:{
+			default :{
 				throw new UnsupportedOperationException("Unknown uri: " + uri);
 			}
 		}
@@ -83,49 +87,55 @@ public class FlavorsProvider extends ContentProvider{
 
 	@Override
 	public Uri insert(Uri uri, ContentValues values){
-		final SQLitedatabase db = mOpenHelper.getWritableDatabase();
-		case FLAVOR:{
-			long _id = db.insert(FlavorEntry.TABLE_FLAVORS, null, values);
-			if(_id > 0){
-				returnUri = FlavorEntry.buildFlavorsUri(_id);
-			} else{
-				throw new android.database.SQLException("Failed to insert row into: " + uri);			
+		final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+		Uri returnUri;
+		switch (sUriMatcher.match(uri)) {
+			case FLAVOR: {
+				long _id = db.insert(FlavorsContract.FlavorEntry.TABLE_FLAVORS, null, values);
+				if (_id > 0) {
+					returnUri = FlavorsContract.FlavorEntry.buildFlavorsUri(_id);
+				} else {
+					throw new android.database.SQLException("Failed to insert row into: " + uri);
+				}
+				break;
 			}
-			break;
-		}
 
-		default: {
-			throw new UnsupportedOperationException("Unknown uri: " + uri);
+			default: {
+				throw new UnsupportedOperationException("Unknown uri: " + uri);
 
+			}
 		}
 		getContext().getContentResolver().notifyChange(uri, null);
 		return returnUri;
 	}
 
 	@Override
-	public Uri delete(Uri uri, String selection, String[] selectionArgs){
-		final SQLitedatabase db = mOpenHelper.getWritableDatabase();
+	public int delete(Uri uri, String selection, String[] selectionArgs){
+		final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 		final int match = sUriMatcher.match(uri);
 		int numDeleted;
 		switch(match){
 			case FLAVOR:
 				numDeleted = db.delete(
-						FlavorEntry.TABLE_FLAVORS, selection, selectionArgs);
+						FlavorsContract.FlavorEntry.TABLE_FLAVORS, selection, selectionArgs);
 				// reset _ID
-				db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + 
-						FlavorEntry.TABLE_FLAVORS + "'");
+				db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+						FlavorsContract.FlavorEntry.TABLE_FLAVORS + "'");
 				break;
 			case FLAVOR_WITH_ID:
-				numDeleted = db.delete(FlavorEntry.TABLE_FLAVORS, FlavorEntry._ID + " = ?",
-						new String[]{String.valueOf(ContentsUris.parseId(uri))});
+				numDeleted = db.delete(FlavorsContract.FlavorEntry.TABLE_FLAVORS,
+						FlavorsContract.FlavorEntry._ID + " = ?",
+						new String[]{String.valueOf(ContentUris.parseId(uri))});
 				// reset _ID
 				db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + 
-						FlavorEntry.TABLE_FLAVORS + "'");
+						FlavorsContract.FlavorEntry.TABLE_FLAVORS + "'");
 
 				break;
 			default:
 				throw new UnsupportedOperationException("Unknown uri: " + uri);
 		}
+
+		return numDeleted;
 	}
 
 	@Override
@@ -145,9 +155,12 @@ public class FlavorsProvider extends ContentProvider{
 						}
 						long _id = -1;
 						try{
-							-id = db.insertOrThrow(FlavorEntry.TABLE_FLAVORS, null, value);
+							_id = db.insertOrThrow(FlavorsContract.FlavorEntry.TABLE_FLAVORS,
+									null, value);
 						}catch(SQLiteConstraintException e) {
-							Log.w(LOG_TAG, "Attempting to insert " + value.getAsString(FlavorEntry.COLUMN_VERSION_NAME)
+							Log.w(LOG_TAG, "Attempting to insert " +
+									value.getAsString(
+											FlavorsContract.FlavorEntry.COLUMN_VERSION_NAME)
 									+ " but value is already in database.");
 						}
 						if (_id != 1){
@@ -175,18 +188,18 @@ public class FlavorsProvider extends ContentProvider{
 			throw new IllegalArgumentException("Cannot have null content values");
 		}
 
-		switch(sUrimatcher.match(uri)){
+		switch(sUriMatcher.match(uri)){
 			case FLAVOR:{
-				numUpdated = db.update(FlavorEntry.TABLE_FLAVORS,
+				numUpdated = db.update(FlavorsContract.FlavorEntry.TABLE_FLAVORS,
 						contentValues,
 						selection,
 						selectionArgs);
 				break;
 			}
 			case FLAVOR_WITH_ID: {
-				numUpdated = db.update(FlavorEntry.TABLE_FLAVORS,
+				numUpdated = db.update(FlavorsContract.FlavorEntry.TABLE_FLAVORS,
 						contentValues,
-						FlavorEntry._ID + " = ?",
+						FlavorsContract.FlavorEntry._ID + " = ?",
 						new String[] {String.valueOf(ContentUris.parseId(uri))});
 				break;
 			}
@@ -196,7 +209,7 @@ public class FlavorsProvider extends ContentProvider{
 		}
 
 		if (numUpdated > 0){
-			getContext().getContentResolver.notifyChange(uri, null);
+			getContext().getContentResolver().notifyChange(uri, null);
 		}
 
 		return numUpdated;
