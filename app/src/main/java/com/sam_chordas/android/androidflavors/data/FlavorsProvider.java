@@ -84,6 +84,20 @@ public class FlavorsProvider extends ContentProvider{
 	@Override
 	public Uri insert(Uri uri, ContentValues values){
 		final SQLitedatabase db = mOpenHelper.getWritableDatabase();
-		case FLAVOR:{}
+		case FLAVOR:{
+			long _id = db.insert(FlavorEntry.TABLE_FLAVORS, null, values);
+			if(_id > 0){
+				returnUri = FlavorEntry.buildFlavorsUri(_id);
+			} else{
+				throw new android.database.SQLException("Failed to insert row into: " + uri);			}
+			break;
+		}
+
+		default: {
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
+
+		}
+		getContext().getContentResolver().notifyChange(uri, null);
+		return returnUri;
 	}
 }
