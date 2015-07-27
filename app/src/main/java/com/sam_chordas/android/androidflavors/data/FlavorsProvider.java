@@ -100,4 +100,23 @@ public class FlavorsProvider extends ContentProvider{
 		getContext().getContentResolver().notifyChange(uri, null);
 		return returnUri;
 	}
+
+	@Override
+	public Uri delete(Uri uri, String selection, String[] selectionArgs){
+		final SQLitedatabase db = mOpenHelper.getWritableDatabase();
+		final int match = sUriMatcher.match(uri);
+		int numDeleted;
+		switch(match){
+			case FLAVOR:
+				numDeleted = db.delete(
+						FlavorEntry.TABLE_FLAVORS, selection, selectionArgs);
+				break;
+			case FLAVOR_WITH_ID:
+				numDeleted = db.delete(FlavorEntry.TABLE_FLAVORS, FlavorEntry._ID + " = ?",
+						new String[]{String.valueOf(ContentsUris.parseId(uri))});
+				break;
+			default:
+				throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
+	}
 }
