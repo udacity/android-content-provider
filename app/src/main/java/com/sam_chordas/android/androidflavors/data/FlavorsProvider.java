@@ -166,5 +166,40 @@ public class FlavorsProvider extends ContentProvider{
 		}
 	}
 
+	@Override
+	public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs){
+		final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+		int numUpdated = 0;
+
+		if (contentValues == null){
+			throw new IllegalArgumentException("Cannot have null content values");
+		}
+
+		switch(sUrimatcher.match(uri)){
+			case FLAVOR:{
+				numUpdated = db.update(FlavorEntry.TABLE_FLAVORS,
+						contentValues,
+						selection,
+						selectionArgs);
+				break;
+			}
+			case FLAVOR_WITH_ID: {
+				numUpdated = db.update(FlavorEntry.TABLE_FLAVORS,
+						contentValues,
+						FlavorEntry._ID + " = ?",
+						new String[] {String.valueOf(ContentUris.parseId(uri))});
+				break;
+			}
+			default:{
+				throw new UnsupportedOperationException("Unknown uri: " + uri);
+			}
+		}
+
+		if (numUpdated > 0){
+			getContext().getContentResolver.notifyChange(uri, null);
+		}
+
+		return numUpdated;
+	}
 
 }
