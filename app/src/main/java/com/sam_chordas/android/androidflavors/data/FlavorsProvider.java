@@ -110,10 +110,17 @@ public class FlavorsProvider extends ContentProvider{
 			case FLAVOR:
 				numDeleted = db.delete(
 						FlavorEntry.TABLE_FLAVORS, selection, selectionArgs);
+				// reset _ID
+				db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + 
+						FlavorEntry.TABLE_FLAVORS + "'");
 				break;
 			case FLAVOR_WITH_ID:
 				numDeleted = db.delete(FlavorEntry.TABLE_FLAVORS, FlavorEntry._ID + " = ?",
 						new String[]{String.valueOf(ContentsUris.parseId(uri))});
+				// reset _ID
+				db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + 
+						FlavorEntry.TABLE_FLAVORS + "'");
+
 				break;
 			default:
 				throw new UnsupportedOperationException("Unknown uri: " + uri);
