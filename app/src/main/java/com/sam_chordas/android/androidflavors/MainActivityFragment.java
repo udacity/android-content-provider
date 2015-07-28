@@ -1,6 +1,8 @@
 package com.sam_chordas.android.androidflavors;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -13,15 +15,16 @@ import android.widget.GridView;
 import com.sam_chordas.android.androidflavors.data.FlavorsContract;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private FlavorAdapter mFlavorAdapter;
+
+    private static final int CURSOR_LOADER_ID = 0;
 
     Flavor[] flavors = {
             new Flavor("Cupcake", R.drawable.cupcake),
@@ -43,7 +46,7 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        mFlavorAdapter = new FlavorAdapter(getActivity(), Arrays.asList(flavors));
+        mFlavorAdapter = new FlavorAdapter(getActivity(), null, 0, CURSOR_LOADER_ID);
 
         GridView gridView = (GridView) rootView.findViewById(R.id.flavors_grid);
         gridView.setAdapter(mFlavorAdapter);
@@ -63,7 +66,7 @@ public class MainActivityFragment extends Fragment {
             byte[] bytesArr = byteBuffer.array();
 
             flavorValuesArr[i].put(FlavorsContract.FlavorEntry.COLUMN_ICON,
-                    flavors[i].image);
+                    bytesArr);
 
             flavorValuesArr[i].put(FlavorsContract.FlavorEntry.COLUMN_VERSION_NAME,
                     flavors[i].name);

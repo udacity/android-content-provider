@@ -1,43 +1,67 @@
 package com.sam_chordas.android.androidflavors;
 
-import android.app.Activity;
+import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.support.v4.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
+import com.sam_chordas.android.androidflavors.data.FlavorsContract;
 
 /**
  * Created by sam_chordas on 7/23/15.
  */
-public class FlavorAdapter extends ArrayAdapter<Flavor> {
+public class FlavorAdapter extends CursorAdapter {
 
     private static final String LOG_TAG = FlavorAdapter.class.getSimpleName();
+    private Context mContext;
+    private static int sLoaderID;
 
-    public FlavorAdapter(Activity context, List<Flavor> flavors){
-        super(context, 0, flavors);
+    public static class ViewHolder {
+        public final ImageView imageView;
+        public final TextView textView;
+
+        public ViewHolder(View view){
+            imageView = (ImageView) view.findViewById(R.id.flavor_image);
+            textView = (TextView) view.findViewById(R.id.flavor_text);
+        }
+    }
+
+    public FlavorAdapter(Context context, Cursor c, int flags, int loaderID){
+        super(context, c, flags);
+        mContext = context;
+        sLoaderID = loaderID;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent){
-        Flavor flavor = getItem(position);
+    public View newView(Context context, Cursor cursor, ViewGroup parent){
+        int layoutId = R.layout.flavor_item;
 
+        View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
 
-        if (convertView == null){
-            convertView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.flavor_item, parent, false);
-        }
+        return view;
+    }
 
-        ImageView iconView = (ImageView) convertView.findViewById(R.id.flavor_image);
-        iconView.setImageResource(flavor.image);
+    @Override
+    public void bindView(View view, Context context, Cursor cursor){
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        TextView textView = (TextView) convertView.findViewById(R.id.flavor_text);
-        textView.setText(flavor.name);
+        int versionIndex = cursor.getColumnIndex(FlavorsContract.FlavorEntry.COLUMN_VERSION_NAME);
+        final String versionName = cursor.getString(versionIndex);
+        viewHolder.textView.setText(versionName);
 
-        return convertView;
+        int imageIndex = cursor.getColumnIndex(FlavorsContract.FlavorEntry.COLUMN_ICON);
+        byte[] bytes = cursor.getBlob(imageIndex);
+        Bitmap map = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        viewHolder.imageView.setImageBitmap(map);
+
     }
 
 }
