@@ -17,6 +17,7 @@ public class FlavorsDBHelper extends SQLiteOpenHelper {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
+	// Create the database
 	@Override
 	public void onCreate(SQLiteDatabase sqLiteDatabase) {
 		final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " +
@@ -29,13 +30,15 @@ public class FlavorsDBHelper extends SQLiteOpenHelper {
 		sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
 	}
 
+	// Upgrade database when version is changed.
 	@Override
 	public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
 		Log.w(LOG_TAG, "Upgrading database from version " + oldVersion + " to " +
 				newVersion + ". OLD DATA WILL BE DESTROYED");
-
+		// Drop the table
 		sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FlavorsContract.FlavorEntry.TABLE_FLAVORS);
 
+		// re-create database
 		onCreate(sqLiteDatabase);
 	}
 }

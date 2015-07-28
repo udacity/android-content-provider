@@ -13,6 +13,10 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Stetho is a tool created by facebook to view your database in chrome inspect.
+        // The code below integrates Stetho into your app. More information here:
+        // http://facebook.github.io/stetho/
         setContentView(R.layout.activity_main);
         Stetho.initialize(
             Stetho.newInitializerBuilder(this)
@@ -21,6 +25,8 @@ public class MainActivity extends ActionBarActivity {
                     .enableWebKitInspector(
                             Stetho.defaultInspectorModulesProvider(this))
                     .build());
+
+        ///////////////
     }
 
 

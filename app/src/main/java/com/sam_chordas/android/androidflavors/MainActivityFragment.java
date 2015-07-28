@@ -27,7 +27,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private GridView mGridView;
 
     private static final int CURSOR_LOADER_ID = 0;
-
+    // Static values for our flavors
     Flavor[] flavors = {
             new Flavor("Cupcake", R.drawable.cupcake),
             new Flavor("Donut", R.drawable.donut),
@@ -46,25 +46,35 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
-        getActivity().getSupportLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
         insertData();
+        // initialize loader
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // inflate fragment_main layout
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+
+        // initialize our FlavorAdapter
         mFlavorAdapter = new FlavorAdapter(getActivity(), null, 0, CURSOR_LOADER_ID);
+        // initialize mGridView to the GridView in fragment_main.xml
         mGridView = (GridView) rootView.findViewById(R.id.flavors_grid);
+        // set mGridView adapter to our CursorAdapter
         mGridView.setAdapter(mFlavorAdapter);
+
 
         return rootView;
     }
 
+    // insert data into database
     public void insertData(){
         ContentValues[] flavorValuesArr = new ContentValues[flavors.length];
+        // Loop through static array of Flavors, add each to an instance of ContentValues
+        // in the array of ContentValues
         for(int i = 0; i < flavors.length; i++){
             flavorValuesArr[i] = new ContentValues();
             Log.i(LOG_TAG, "Integer reference to drawable: " + flavors[i].image);
@@ -74,10 +84,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         }
         Log.d(LOG_TAG, "Uri: )" + FlavorsContract.FlavorEntry.CONTENT_URI.toString());
 
+        // bulkInsert our ContentValues array
         getActivity().getContentResolver().bulkInsert(FlavorsContract.FlavorEntry.CONTENT_URI,
                 flavorValuesArr);
     }
 
+    // Attach loader to our flavors database query
+    // run when loader is initialized
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args){
         return new CursorLoader(getActivity(),
@@ -93,14 +106,16 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         super.onViewCreated(view, savedInstanceState);
     }
 
+    // Set the cursor in our CursorAdapter once the Cursor is loaded
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mFlavorAdapter.changeCursor(data);
+        mFlavorAdapter.swapCursor(data);
 
     }
 
+    // reset CursorAdapter on Loader Reset
     @Override
     public void onLoaderReset(Loader<Cursor> loader){
-        mFlavorAdapter.changeCursor(null);
+        mFlavorAdapter.swapCursor(null);
     }
 }

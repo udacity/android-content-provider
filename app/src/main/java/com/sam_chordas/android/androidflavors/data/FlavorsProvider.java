@@ -16,13 +16,18 @@ public class FlavorsProvider extends ContentProvider{
 	private static final UriMatcher sUriMatcher = buildUriMatcher();
 	private FlavorsDBHelper mOpenHelper;
 
+	// Codes for the UriMatcher //////
 	private static final int FLAVOR = 100;
 	private static final int FLAVOR_WITH_ID = 200;
+	////////
 
 	private static UriMatcher buildUriMatcher(){
+		// Build a UriMatcher by adding a specific code to return based on a match
+		// It's common to use NO_MATCH as the code for this case.
 		final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 		final String authority = FlavorsContract.CONTENT_AUTHORITY;
 
+		// add a code for each type of URI you want
 		matcher.addURI(authority, FlavorsContract.FlavorEntry.TABLE_FLAVORS, FLAVOR);
 		matcher.addURI(authority, FlavorsContract.FlavorEntry.TABLE_FLAVORS + "/#", FLAVOR_WITH_ID);
 
@@ -57,6 +62,7 @@ public class FlavorsProvider extends ContentProvider{
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder){
 		Cursor retCursor;
 		switch(sUriMatcher.match(uri)){
+			// All Flavors selected
 			case FLAVOR:{    
 				retCursor = mOpenHelper.getReadableDatabase().query(
 						FlavorsContract.FlavorEntry.TABLE_FLAVORS,
@@ -68,6 +74,7 @@ public class FlavorsProvider extends ContentProvider{
 						sortOrder);
 				return retCursor;
 			}
+			// Individual flavor based on Id selected
 			case FLAVOR_WITH_ID:{
 				retCursor = mOpenHelper.getReadableDatabase().query(
 						FlavorsContract.FlavorEntry.TABLE_FLAVORS,
@@ -80,6 +87,7 @@ public class FlavorsProvider extends ContentProvider{
 				return retCursor;
 			}
 			default :{
+				// By default, we assume a bad URI
 				throw new UnsupportedOperationException("Unknown uri: " + uri);
 			}
 		}
@@ -92,6 +100,7 @@ public class FlavorsProvider extends ContentProvider{
 		switch (sUriMatcher.match(uri)) {
 			case FLAVOR: {
 				long _id = db.insert(FlavorsContract.FlavorEntry.TABLE_FLAVORS, null, values);
+				// insert unless it is already contained in the database
 				if (_id > 0) {
 					returnUri = FlavorsContract.FlavorEntry.buildFlavorsUri(_id);
 				} else {
@@ -146,8 +155,10 @@ public class FlavorsProvider extends ContentProvider{
 		Log.i(LOG_TAG, "match = " + match);
 		switch(match){
 			case FLAVOR:
+				// allows for multiple transactions
 				db.beginTransaction();
 
+				// keep track of successful inserts
 				int numInserted = 0;
 				try{
 					for(ContentValues value : values){
@@ -170,12 +181,17 @@ public class FlavorsProvider extends ContentProvider{
 						}
 					}
 					if(numInserted > 0){
+						// If no errors, declare a successful transaction.
+						// database will not populate if this is not called
 						db.setTransactionSuccessful();
 					}
 				} finally {
+					// all transactions occur at once
 					db.endTransaction();
 				}
 				if (numInserted > 0){
+					// if there was successful insertion, notify the content resolver that there
+					// was a change
 					getContext().getContentResolver().notifyChange(uri, null);
 				}
 				return numInserted;
