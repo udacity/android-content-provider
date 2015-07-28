@@ -11,7 +11,7 @@ public class FlavorsContract{
 
 	public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
-	public static final String FLAVOR = "flavors";
+	public static final String FLAVOR = "flavor";
 
 	public static final class FlavorEntry implements BaseColumns{
 		public static final String TABLE_FLAVORS = FLAVOR;
@@ -21,11 +21,11 @@ public class FlavorsContract{
 		public static final String COLUMN_VERSION_NAME = "version_name";
 
 		public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-			.appendPath(FLAVOR).build();
+			.appendPath(TABLE_FLAVORS).build();
 		public static final String CONTENT_DIR_TYPE =
-		ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + FLAVOR;
+		ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + TABLE_FLAVORS;
 		public static final String CONTENT_ITEM_TYPE =
-			ContentResolver.CURSOR_ITEM_BASE_TYPE +"/" + CONTENT_AUTHORITY + "/" + FLAVOR;
+			ContentResolver.CURSOR_ITEM_BASE_TYPE +"/" + CONTENT_AUTHORITY + "/" + TABLE_FLAVORS;
 
 		public static Uri buildFlavorsUri(long id){
         		return ContentUris.withAppendedId(CONTENT_URI, id);

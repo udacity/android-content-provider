@@ -11,7 +11,7 @@ public class FlavorsDBHelper extends SQLiteOpenHelper {
 
 	//name & version
 	private static final String DATABASE_NAME = "flavors.db";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 4;
 
 	public FlavorsDBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -24,7 +24,7 @@ public class FlavorsDBHelper extends SQLiteOpenHelper {
 				" INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				FlavorsContract.FlavorEntry.COLUMN_VERSION_NAME
 				+ " TEXT NOT NULL, " + FlavorsContract.FlavorEntry.COLUMN_ICON +
-				" BLOB NOT NULL);";
+				" INTEGER);";
 
 		sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
 	}
