@@ -86,7 +86,7 @@ public class FlavorsProvider extends ContentProvider{
 						sortOrder);
 				return retCursor;
 			}
-			default :{
+			default:{
 				// By default, we assume a bad URI
 				throw new UnsupportedOperationException("Unknown uri: " + uri);
 			}
@@ -149,10 +149,8 @@ public class FlavorsProvider extends ContentProvider{
 
 	@Override
 	public int bulkInsert(Uri uri, ContentValues[] values){
-//		Log.d(LOG_TAG, "In bulk insert");
 		final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 		final int match = sUriMatcher.match(uri);
-		Log.i(LOG_TAG, "match = " + match);
 		switch(match){
 			case FLAVOR:
 				// allows for multiple transactions
@@ -176,7 +174,6 @@ public class FlavorsProvider extends ContentProvider{
 									+ " but value is already in database.");
 						}
 						if (_id != 1){
-							Log.i(LOG_TAG, "Id: " + _id);
 							numInserted++;
 						}
 					}

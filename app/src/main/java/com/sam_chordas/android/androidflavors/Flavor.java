@@ -5,10 +5,12 @@ package com.sam_chordas.android.androidflavors;
  */
 public class Flavor {
     String name;
+    String description;
     int image;
 
-    public Flavor(String name, int image){
+    public Flavor(String name, String description, int image){
         this.name = name;
         this.image = image;
+        this.description = description;
     }
 }

@@ -11,14 +11,14 @@ public class FlavorsContract{
 
 	public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
-	public static final String FLAVOR = "flavor";
 
 	public static final class FlavorEntry implements BaseColumns{
 		// table name
-		public static final String TABLE_FLAVORS = FLAVOR;
+		public static final String TABLE_FLAVORS = "flavor";
 		// columns
 		public static final String _ID = "_id";
 		public static final String COLUMN_ICON = "icon";
+		public static final String COLUMN_DESCRIPTION = "description";
 		public static final String COLUMN_VERSION_NAME = "version_name";
 
 		// create content uri

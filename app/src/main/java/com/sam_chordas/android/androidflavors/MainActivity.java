@@ -8,7 +8,7 @@ import android.view.MenuItem;
 import com.facebook.stetho.Stetho;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,13 +18,15 @@ public class MainActivity extends ActionBarActivity {
         // The code below integrates Stetho into your app. More information here:
         // http://facebook.github.io/stetho/
         setContentView(R.layout.activity_main);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                new MainActivityFragment()).commit();
         Stetho.initialize(
-            Stetho.newInitializerBuilder(this)
-                    .enableDumpapp(
-                            Stetho.defaultDumperPluginsProvider(this))
-                    .enableWebKitInspector(
-                            Stetho.defaultInspectorModulesProvider(this))
-                    .build());
+                Stetho.newInitializerBuilder(this)
+                        .enableDumpapp(
+                                Stetho.defaultDumperPluginsProvider(this))
+                        .enableWebKitInspector(
+                                Stetho.defaultInspectorModulesProvider(this))
+                        .build());
 
         ///////////////
     }
@@ -51,4 +53,5 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
