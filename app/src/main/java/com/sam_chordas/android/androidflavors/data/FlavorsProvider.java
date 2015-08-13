@@ -173,7 +173,7 @@ public class FlavorsProvider extends ContentProvider{
 											FlavorsContract.FlavorEntry.COLUMN_VERSION_NAME)
 									+ " but value is already in database.");
 						}
-						if (_id != 1){
+						if (_id != -1){
 							numInserted++;
 						}
 					}
