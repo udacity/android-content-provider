@@ -20,7 +20,7 @@ public class FlavorsDBHelper extends SQLiteOpenHelper {
 	// Create the database
 	@Override
 	public void onCreate(SQLiteDatabase sqLiteDatabase) {
-		final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " +
+		final String SQL_CREATE_FLAVOR_TABLE = "CREATE TABLE " +
 				FlavorsContract.FlavorEntry.TABLE_FLAVORS + "(" + FlavorsContract.FlavorEntry._ID +
 				" INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				FlavorsContract.FlavorEntry.COLUMN_VERSION_NAME + " TEXT NOT NULL, " +
@@ -29,7 +29,7 @@ public class FlavorsDBHelper extends SQLiteOpenHelper {
 				FlavorsContract.FlavorEntry.COLUMN_ICON +
 				" INTEGER NOT NULL);";
 
-		sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
+		sqLiteDatabase.execSQL(SQL_CREATE_FLAVOR_TABLE);
 	}
 
 	// Upgrade database when version is changed.
